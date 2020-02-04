@@ -1,10 +1,17 @@
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.junit.*;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 public class ApiTestGet {
+
 
     private static RequestSpecification requestSpec;
 
@@ -17,9 +24,68 @@ public class ApiTestGet {
     }
 
     @Test()
-    public void testGet() {
-        given().spec(requestSpec)
-                .when().get("/get?a=1")
-                .then().body("args.a", equalTo("1")).statusCode(200);
+    public void testGetAis1() {
+        given()
+                .spec(requestSpec)
+                .when()
+                .get("/get?a=1")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("args.a", equalTo("1"));
+    }
+
+
+    @Test()
+    public void testGetAis1andBis2() {
+        given()
+                .spec(requestSpec)
+                .when()
+                .get("/get?a=1&b=2")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("args.a", equalTo("1"));
+    }
+
+    @Test
+    public void testPostAis1(){
+        given()
+                .spec(requestSpec)
+                .when()
+                .post("post?a=1")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("args.a", equalTo("1"));
+    }
+
+    @Test
+    public void testPost(){
+        given()
+                .spec(requestSpec)
+                .formParam("a", Arrays.asList(1,2,4,5))
+                .queryParam("b", 2)
+                .when()
+                .post("post?c=3")
+                .then()
+                .log().all()
+                .statusCode(200);
+    }
+
+
+
+    @Test
+    public void testPostWithJSON(){
+
+        String a = "{\"phoneNumber\":\"353837986524\", \"messageContent\":\"test\"}";
+
+        given()
+                .spec(requestSpec)
+                .body(a)
+                .when()
+                .post("post")
+                .then()
+                .log().all();
     }
 }
