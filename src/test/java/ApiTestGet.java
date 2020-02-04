@@ -1,5 +1,6 @@
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import org.json.JSONObject;
 import org.junit.*;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -78,11 +79,16 @@ public class ApiTestGet {
     @Test
     public void testPostWithJSON(){
 
-        String a = "{\"phoneNumber\":\"353837986524\", \"messageContent\":\"test\"}";
+        //String a = "{\"phoneNumber\":\"353837986524\", \"messageContent\":\"test\"}"; //json стрингой
+
+        JSONObject jsonObj = new JSONObject()
+                .put("phoneNumber","353837986524")
+                .put("messageContent","test");
 
         given()
                 .spec(requestSpec)
-                .body(a)
+                .contentType("application/json")
+                .body(jsonObj.toString())
                 .when()
                 .post("post")
                 .then()
