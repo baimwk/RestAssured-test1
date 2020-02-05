@@ -94,4 +94,29 @@ public class ApiTestGet {
                 .then()
                 .log().all();
     }
+
+    @Test
+    public void testPut(){
+        JSONObject jsonObj = new JSONObject()
+                .put("phoneNumber","353837986524")
+                .put("messageContent","test");
+        given()
+                .spec(requestSpec)
+                .contentType("application/json")
+                .body(jsonObj.toString())
+                .when()
+                .put("put")
+                .then()
+                .log().all();
+    }
+
+    @Test
+    public void testDelete(){
+        given()
+                .spec(requestSpec)
+                .when()
+                .delete("delete")
+                .then()
+                .log().all();
+    }
 }
