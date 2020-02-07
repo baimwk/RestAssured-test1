@@ -1,7 +1,10 @@
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.json.JSONObject;
 import org.junit.*;
+import org.junit.experimental.theories.DataPoint;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Arrays;
@@ -9,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.*;
+import static io.restassured.config.XmlConfig.xmlConfig;
 import static org.hamcrest.Matchers.*;
 
 public class ApiTestGet {
@@ -24,18 +28,47 @@ public class ApiTestGet {
                 build();
     }
 
+
     @Test()
-    public void testGetAis1() {
+    public void testGetAis12() {
         given()
                 .spec(requestSpec)
                 .when()
-                .get("/get?a=1")
+                .get("/get?a=12")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("args.a", equalTo("12"))
+                .body("args.a", not(equalTo("3")));
+    }
+
+    @Test
+    public void testGetAis1QueryParam() {
+        given()
+                .spec(requestSpec)
+                .queryParam("a", "1") //get?a=1
+                .when()
+                .get("/get")
                 .then()
                 .log().all()
                 .statusCode(200)
                 .body("args.a", equalTo("1"));
+
     }
 
+    @Test
+    public void testGetBase64PathParam() {
+        given()
+                .spec(requestSpec)
+                .pathParam("base", "base64")
+                .pathParam("value", "SFRUUEJJTiBpcyBhd2Vzb21l")
+                .when()
+                .get("/{base}/{value}")// /base64/SFRUUEJJTiBpcyBhd2Vzb21l
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("html.body", equalTo("HTTPBIN is awesome"));
+    }
 
     @Test()
     public void testGetAis1andBis2() {
@@ -73,7 +106,6 @@ public class ApiTestGet {
                 .log().all()
                 .statusCode(200);
     }
-
 
 
     @Test
@@ -119,4 +151,19 @@ public class ApiTestGet {
                 .then()
                 .log().all();
     }
+
+    @Test
+    public void testGetXML(){
+        given()
+                .spec(requestSpec)
+                .when()
+                .get("xml")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("slideshow.slide[0].title", equalTo("Wake up to WonderWidgets!"))
+                .contentType(ContentType.XML);
+    }
+    
+
 }
